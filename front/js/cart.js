@@ -102,6 +102,8 @@ function updatePriceAndQuantity(id, newValue, item) {      // cette fonction va 
     displayTotalQuantity ()
     displayTotalPrice ()
     saveNewDataToLocalStorage (item)
+    controleLocalStorage(item)
+
 }
 
 function deleteDataFromLocalStorage (item) {
@@ -116,6 +118,16 @@ function saveNewDataToLocalStorage (item) {
     localStorage.setItem(key, dataToSave) // pour que l'update soit fait dans le localStorage
 }
 
+function controleLocalStorage (item) {
+    if (productInLocalStorage) {
+        const findResult = productInLocalStorage.find(color,id)
+
+        if (findResult) {
+
+            let newQuantity = localStorage.setItem("products", JSON.stringify(productInLocalStorage, newQuantity, item)); //recherche de la quantité et mise à jour avec la quantité ajouté
+            console.log (controleLocalStorage)}
+}
+}
 
 
 function addDeleteToSettings (settings, item){
@@ -191,4 +203,60 @@ function makeImageDiv(item){
     image.alt = item.altTxt 
     div.appendChild(image)
     return div
+}
+
+//       F O R M U L A I R E   D E   C O N T A C T 
+
+
+function submitForm(e){
+    e.preventDefault()  // pour pas que ça actualise a chaque submit-formulaire
+    if (cart.length === 0 ) alert ("Veuillez sélectionner un produit à commander")
+
+    const body = makeRequestBody()
+    fetch("http://localhost:3000/api/products/order", {
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: {
+            'Accept': 'application/json', 
+            "Content-Type": "application/json"
+        }
+    })
+    .then((res) => res.json())
+    .then((data) => console.log(data))
+
+  //  console.log(form.elements)  // pour recup tous les elements du formulaire
+}
+
+function makeRequestBody() {
+    const form = document.querySelector(".cart__order__form")
+    const firstName = form.elements.firstName.value
+    const lastName = form.elements.lastName.value
+    const address = form.elements.address.value
+    const city = form.elements.city.value
+    const email = form.elements.email.value
+
+
+    const body = { contact : {
+        firstName: firstName,
+        lastName : lastName,
+        address: address,
+        city : city,
+        email : email
+
+    },
+    products: getIdsFromLocalStorage()
+
+    }
+return body
+}
+
+function getIdsFromLocalStorage () {
+    const numberOfProducts = localStorage.length
+    const ids = []
+    for (let i = 0; i < numberOfProducts; i++) {
+        const key = localStorage.key(i)
+        const id = key.split("-")[0]
+        ids.push(id)
+    }
+    return ids
 }
