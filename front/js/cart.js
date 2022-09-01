@@ -102,7 +102,6 @@ function updatePriceAndQuantity(id, newValue, item) {      // cette fonction va 
     displayTotalQuantity ()
     displayTotalPrice ()
     saveNewDataToLocalStorage (item)
-    controleLocalStorage(item)
 
 }
 
@@ -116,17 +115,6 @@ function saveNewDataToLocalStorage (item) {
     const dataToSave = JSON.stringify(item) // stringify pour que le changement de quantité soit dans un format que le local storage comprend
     const key = `${item.id}-${item.color}`
     localStorage.setItem(key, dataToSave) // pour que l'update soit fait dans le localStorage
-}
-
-function controleLocalStorage (item) {
-    if (productInLocalStorage) {
-        const findResult = productInLocalStorage.find(color,id)
-
-        if (findResult) {
-
-            let newQuantity = localStorage.setItem("products", JSON.stringify(productInLocalStorage, newQuantity, item)); //recherche de la quantité et mise à jour avec la quantité ajouté
-            console.log (controleLocalStorage)}
-}
 }
 
 
@@ -260,3 +248,4 @@ function getIdsFromLocalStorage () {
     }
     return ids
 }
+
