@@ -1,7 +1,7 @@
 fetch('http://localhost:3000/api/products')  // fetch va permettre de récup les données de l'api
 .then((res) => res.json()) 
 .then((data) => addProducts(data))
-
+.catch((err) => console.log(err))
 
 function addProducts(data) {
 

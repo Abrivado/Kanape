@@ -70,10 +70,11 @@ button.addEventListener("click", handleClick)  // pour voir ce qui se passe quan
 function handleClick(){
     const color = document.querySelector("#colors").value
     const quantity = document.querySelector("#quantity").value // pour récup les données de la couleur et de la quantité
-    
 
     if (isOrderInvalid(color, quantity)) return  // pour empecher la redirection au panier si il manque les infos
-    saveOrder(color, quantity) // si tout est ok la commande sera sauvegardée 
+
+    saveOrder(color, quantity) 
+
     window.location.href = "cart.html" // puis redirection vers panier
 
 }
@@ -93,19 +94,69 @@ function saveOrder(color, quantity){
         
     }
 
-    localStorage.setItem(key, JSON.stringify(data)) // JSON ne peut pas stocker des objets, mais seulement des string. C'est pour ça qu'il faut les stringify pour qu'elles puissent être interprétées
-    // le locaStorage sert a enregistrer les données pour chaque utilisateur sur le site (tel des cookies)
+    localStorage.setItem(key, JSON.stringify(data),
+    alert ("Votre produit a bien été ajouté au panier"))
+
+
+
+    let tabProduct = JSON.parse(localStorage.getItem("produit", key))
+    if (tabProduct != null){
+    for (i = 0; i < tabProduct.length; i++) {
+        console.log("test");
+
+
+ //       if (
+  //          tabProduct[i]._id == key._id 
+  //      ) {
+   //       return (
+     //       tabProduct[i].quantite++,
+       //     console.log("quantite++"),
+         //   localStorage.setItem("produit", JSON.stringify(tabProduct)),
+           // (tabProduct = JSON.parse(localStorage.getItem("produit"))),
+           // (spanQuantite.textContent = addQuantity(tabProduct))
+         // );
+      //  }
+      }
+
+    }
+
 }
 
+
+
+   
+ //   const productInLocalStorage = tabProduct
+ //       if (productInLocalStorage){
+ //           let newQuantity =  localStorage.getItem("product", JSON.stringify(productInLocalStorage))
+  //          newQuantity.quantity = Number(productInLocalStorage)
+    //    }
+            
+    //}
+    
+    
+    // JSON ne peut pas stocker des objets, mais seulement des string. C'est pour ça qu'il faut les stringify pour qu'elles puissent être interprétées
+    // le locaStorage sert a enregistrer les données pour chaque utilisateur sur le site (tel des cookies)
+
+  //  if (productInLocalStorage){
+    //const findResult = productInLocalStorage.find(color, id)
+    //}
+
+
+
 function isOrderInvalid(color, quantity){
-    if (color == null || color === "" || quantity == null || quantity == "0") { // si color ou quantity = null et/ou 0, envoyer le message d'erreur
-        alert("Veuillez sélectionner une couleur et une quantité")
+    if (color == null || color === "" || quantity == null || quantity == "0" || quantity > 100 || quantity < 0) { // si color ou quantity = null et/ou 0, envoyer le message d'erreur
+        alert("Veuillez sélectionner une couleur et une quantité entre 1 et 100")
         return true  // si "true" apparait c'est qu'une des conditions de "if" est validée et donc pas de redirection au panier 
     }
     
 }
 
 
+    
+//    if (productInLocalStorage) {
+//        const findResult = productInLocalStorage.find(tabProduct)
+//        alert("Vous avez ajouté un produit au panier")
+//}}
 
 
 

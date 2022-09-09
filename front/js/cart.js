@@ -106,8 +106,7 @@ function updatePriceAndQuantity(id, newValue, item) {      // cette fonction va 
 }
 
 function deleteDataFromLocalStorage (item) {
-    const key = `${item.id}-${item.color}` // à rajouter dans les backticks pour avoir la couleur
-    console.log("on retire cette key", key)
+    const key = `${item.id}` // à rajouter dans les backticks pour avoir la couleur
     localStorage.removeItem(key)
 }
 
@@ -133,19 +132,20 @@ function addDeleteToSettings (settings, item){
 }
 
 function deleteItem(item){
-    const itemToDelete = cart.findIndex(
+    const itemToDelete = cart.findIndex(  // findIndex sert à trouver le produit dans la liste
         (product) => product.id === item.id && product.color === item.color)  
     cart.splice(itemToDelete, 1) // cart.splice pour supprimer une array, il démarrera à itemToDelete et il en supprimera 1
-    displayTotalQuantity // pour que ça soit mis à jour dans le total
-    displayTotalPrice
+    displayTotalQuantity () // pour que ça soit mis à jour dans le total
+    displayTotalPrice()
     deleteDataFromLocalStorage (item)
     deleteArticleFromPage (item)
+    console.log(cart)
 
 }
 
 function deleteArticleFromPage(item) {
     const articleToDelete = document.querySelector(  
-        `article[data-id="${item.id}"]` //[data-color="${item.color}"]`  // pour selectionner l'id et la couleur de l'article qu'on veut supprimer
+        `article[data-id="${item.id}"][data-color="${item.color}"]`  // pour selectionner l'id et la couleur de l'article qu'on veut supprimer
     )
     articleToDelete.remove() 
 
@@ -198,7 +198,18 @@ function makeImageDiv(item){
 
 function submitForm(e){
     e.preventDefault()  // pour pas que ça actualise a chaque submit-formulaire
-    if (cart.length === 0 ) alert ("Veuillez sélectionner un produit à commander")
+    if (cart.length === 0 ) {
+        alert ("Veuillez sélectionner un produit à commander")
+        return  // pour que la requete ne se fasse pas si pas de produits dans le panier
+    }
+
+
+    testForm()
+    testEmail()
+
+    //if (testForm()) return  // si le testForm est invalide (true) on ne pourra pas aller plus loin
+    //if (testEmail()) return  // si le testEmail est invalide (true) on ne pourra pas aller plus loin
+
 
     const body = makeRequestBody()
     fetch("http://localhost:3000/api/products/order", {
@@ -210,10 +221,43 @@ function submitForm(e){
         }
     })
     .then((res) => res.json())
-    .then((data) => console.log(data))
+    .then((data) => {
+        const orderId = data.orderId  // pour envoyer les données vers la page de confirmation
+        window.location.href = "confirmation.html" + "?orderId=" + orderId // l'orderId sera directement collé a l'url de la page confirmation
+    })
+    .catch((err) => console.error(err)) // cette ligne permet d'afficher les erreurs si il y'en a
 
   //  console.log(form.elements)  // pour recup tous les elements du formulaire
 }
+
+function testForm(){
+    const form = document.querySelector(".cart__order__form")
+    const inputs = form.querySelectorAll("input")   // pour verifier que tous les champs input soient remplis
+    inputs.forEach((input) => {
+        if (input.value === ""){      // si une valeur est nulle, une alerte sera envoyée
+            alert("Veuillez remplir tous les champs du formulaire")
+   return true  // le formulaire ne sera pas envoyé si un input est vide 
+        }
+       return false // le formulaire sera envoyé si tout est rempli
+    })
+}
+
+function testEmail(){
+    const email = document.querySelector("#email").value
+    const regex = /^[A-Za-z0-9+_.-]+@(.+)$/  // le format accepté pour un email
+    if (regex.test(email) === false) {
+        alert("Veuillez saisir un email valide") // le formulaire ne sera pas envoyé si le mail n'est pas d'un bon format
+        return true
+              
+        }
+        return false // le formulaire sera envoyé si l'email est ok 
+    }
+
+
+
+ 
+
+
 
 function makeRequestBody() {
     const form = document.querySelector(".cart__order__form")
