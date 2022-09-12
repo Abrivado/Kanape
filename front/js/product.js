@@ -81,7 +81,7 @@ function handleClick(){
 
 
 function saveOrder(color, quantity){
-    const key = `${id}-${color}` // cette constant key sert à rajouter la couleur à l'id pour pouvoir différencier un même produit de couleurs différentes
+    //const key = `${id}-${color}` // cette constant key sert à rajouter la couleur à l'id pour pouvoir différencier un même produit de couleurs différentes
 
     const data = {            // j'ai crée cet objet afin que toutes ces données soient récup dans le localStorage sur une seule ligne
         id: `${id}-${color}`,
@@ -94,15 +94,49 @@ function saveOrder(color, quantity){
         
     }
 
-    localStorage.setItem(key, JSON.stringify(data),
-    alert ("Votre produit a bien été ajouté au panier"))
+
+    let productInLocalStorage = JSON.parse(localStorage.getItem("product"))
+
+    // if (productInLocalStorage){
+    //     const findResult = productInLocalStorage.find(id)
+
+    //         if(findResult) {
+    //             let newQuantity =
+    //             parseInt(data.quantity)+parseInt(findResult.quantity)
+    //             findResult.quantity = newQuantity
+    //             localStorage.setItem("products", JSON.stringify(productInLocalStorage, data))
+    //             console.log(productInLocalStorage)
+    //             alert ("Votre produit a bien été ajouté au panier")
+    //         } else {
+    //             productInLocalStorage.push(data)
+    //             localStorage.setItem("products", JSON.stringify(productInLocalStorage, data))
+    //             console.log(productInLocalStorage)
+    //             alert ("Votre produit a bien été ajouté au panier")
+    //         }
+    //     }else{
+
+             productInLocalStorage = []
+             productInLocalStorage.push(data)
+             localStorage.setItem("product", JSON.stringify(productInLocalStorage))
+             console.log(productInLocalStorage)
+             alert ("Votre produit a bien été ajouté au panier")
+
+         }
+    
+    
 
 
 
-    let tabProduct = JSON.parse(localStorage.getItem("produit", key))
-    if (tabProduct != null){
-    for (i = 0; i < tabProduct.length; i++) {
-        console.log("test");
+
+//   localStorage.setItem(key, JSON.stringify(data),
+//  alert ("Votre produit a bien été ajouté au panier")) 
+
+
+
+    // let tabProduct = JSON.parse(localStorage.getItem("produit", key))
+    // if (tabProduct != null){
+    // for (i = 0; i < tabProduct.length; i++) {
+    //     console.log("test");
 
 
  //       if (
@@ -116,11 +150,11 @@ function saveOrder(color, quantity){
            // (spanQuantite.textContent = addQuantity(tabProduct))
          // );
       //  }
-      }
+//       }
 
-    }
+//     }
 
-}
+ //}
 
 
 
