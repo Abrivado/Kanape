@@ -71,9 +71,12 @@ function handleClick(){
     const color = document.querySelector("#colors").value
     const quantity = document.querySelector("#quantity").value // pour récup les données de la couleur et de la quantité
 
+
+
     if (isOrderInvalid(color, quantity)) return  // pour empecher la redirection au panier si il manque les infos
 
     saveOrder(color, quantity) 
+
 
     window.location.href = "cart.html" // puis redirection vers panier
 
@@ -81,7 +84,7 @@ function handleClick(){
 
 
 function saveOrder(color, quantity){
-    //const key = `${id}-${color}` // cette constant key sert à rajouter la couleur à l'id pour pouvoir différencier un même produit de couleurs différentes
+    const key = `${id}-${color}` // cette constant key sert à rajouter la couleur à l'id pour pouvoir différencier un même produit de couleurs différentes
 
     const data = {            // j'ai crée cet objet afin que toutes ces données soient récup dans le localStorage sur une seule ligne
         id: `${id}-${color}`,
@@ -95,41 +98,46 @@ function saveOrder(color, quantity){
     }
 
 
-    let productInLocalStorage = JSON.parse(localStorage.getItem("product"))
+    localStorage.setItem(key, JSON.stringify(data),
+   alert ("Votre produit a bien été ajouté au panier")) }
 
-    // if (productInLocalStorage){
-    //     const findResult = productInLocalStorage.find(id)
 
-    //         if(findResult) {
-    //             let newQuantity =
-    //             parseInt(data.quantity)+parseInt(findResult.quantity)
-    //             findResult.quantity = newQuantity
-    //             localStorage.setItem("products", JSON.stringify(productInLocalStorage, data))
-    //             console.log(productInLocalStorage)
-    //             alert ("Votre produit a bien été ajouté au panier")
-    //         } else {
-    //             productInLocalStorage.push(data)
-    //             localStorage.setItem("products", JSON.stringify(productInLocalStorage, data))
-    //             console.log(productInLocalStorage)
-    //             alert ("Votre produit a bien été ajouté au panier")
-    //         }
-    //     }else{
+   /////////////   S O L U T I O N    M E N T O R    V E R I F    P A N I E R 
 
-             productInLocalStorage = []
-             productInLocalStorage.push(data)
-             localStorage.setItem("product", JSON.stringify(productInLocalStorage))
-             console.log(productInLocalStorage)
-             alert ("Votre produit a bien été ajouté au panier")
 
-         }
+ //   let productInLocalStorage = JSON.parse(localStorage.getItem("product"))
+
+    //  if (productInLocalStorage){
+    //      const findResult = productInLocalStorage.find(data)
+
+    //          if(findResult) {
+    //              let newQuantity =
+    //              parseInt(data.quantity)+parseInt(findResult.quantity)
+    //              findResult.quantity = newQuantity
+    //              localStorage.setItem("products", JSON.stringify(productInLocalStorage, data))
+    //              console.log(productInLocalStorage)
+    //              alert ("Votre produit a bien été ajouté au panier")
+    //          } else {
+    //              productInLocalStorage.push(data)
+    //              localStorage.setItem("products", JSON.stringify(productInLocalStorage, data))
+    //              console.log(productInLocalStorage)
+    //              alert ("Votre produit a bien été ajouté au panier")
+    //          }
+    //      }else{
+
+        //       productInLocalStorage = []
+        //        productInLocalStorage.push(data)
+        //        localStorage.setItem("product", JSON.stringify(productInLocalStorage))
+        //        console.log(productInLocalStorage)
+        //        alert ("Votre produit a bien été ajouté au panier")
+
+        //    }
+        
     
     
 
 
-
-
-//   localStorage.setItem(key, JSON.stringify(data),
-//  alert ("Votre produit a bien été ajouté au panier")) 
+/////////////   A U T R E      S O L U T I O N    T E S T E E
 
 
 
@@ -186,11 +194,7 @@ function isOrderInvalid(color, quantity){
 }
 
 
-    
-//    if (productInLocalStorage) {
-//        const findResult = productInLocalStorage.find(tabProduct)
-//        alert("Vous avez ajouté un produit au panier")
-//}}
+
 
 
 

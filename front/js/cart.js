@@ -1,21 +1,40 @@
 
 const cart = [] // pour avoir une liste totale du panier
 
-recupItemsDuCache()
-cart.forEach((item) => displayItem(item))
 
-const orderButton = document.querySelector("#order")
-orderButton.addEventListener("click", (e) => submitForm(e)) // pour soumettre le formulaire lorsqu'on clique sur le bouton commander
+  recupItemsDuCache()
+  cart.forEach((item) => displayItem(item))
+
+  
+
+  function recupItemsDuCache(){
+      const numberOfItems = localStorage.length  // pour récupérer le nb d'object ajoutés au panier
+      for (let i = 0; i < numberOfItems; i++) {
+          const item = localStorage.getItem(localStorage.key(i)) || ""
+          const itemObject = JSON.parse(item) // ≠ stringyfy, permet de transformer une string en objet
+          cart.push(itemObject) // dès qu'on aura un objet il sera push dans la liste du panier 
+      }
+  }
+
+/////////////   S O L U T I O N    M E N T O R 
 
 
-function recupItemsDuCache(){
-    const numberOfItems = localStorage.length  // pour récupérer le nb d'object ajoutés au panier
-    for (let i = 0; i < numberOfItems; i++) {
-        const item = localStorage.getItem(localStorage.key(i)) || ""
-        const itemObject = JSON.parse(item) // ≠ stringyfy, permet de transformer une string en objet
-        cart.push(itemObject) // dès qu'on aura un objet il sera push dans la liste du panier 
-    }
-}
+// let productInLocalStorage = JSON.parse(localStorage.getItem('product'))
+
+// fetch("http://localhost:3000/api/products")
+// .then((res) => res.json()) 
+// .then((data) => {
+//     if (productInLocalStorage){
+//         for (p of productInLocalStorage){
+//             const product = data.find(d=> d._id === p.idProduit)
+//             if (product) {
+//                 p.price = product.price
+
+//             }
+//         }
+//     }
+//    
+// })
 
 function displayItem(item){
     const article = makeArticle(item)
@@ -191,105 +210,254 @@ function makeImageDiv(item){
     image.alt = item.altTxt 
     div.appendChild(image)
     return div
+
+
+
 }
 
-//       F O R M U L A I R E   D E   C O N T A C T 
+////////////////////////////              F O R M U L A I R E 
 
 
-function submitForm(e){
-    e.preventDefault()  // pour pas que ça actualise a chaque submit-formulaire
-    if (cart.length === 0 ) {
-        alert ("Veuillez sélectionner un produit à commander")
-        return  // pour que la requete ne se fasse pas si pas de produits dans le panier
-    }
 
 
-    testForm()
-    testEmail()
 
-    //if (testForm()) return  // si le testForm est invalide (true) on ne pourra pas aller plus loin
-    //if (testEmail()) return  // si le testEmail est invalide (true) on ne pourra pas aller plus loin
+ const orderButton = document.querySelector("#order")
+   orderButton.addEventListener("click", (e) => submitForm(e)) // pour soumettre le formulaire lorsqu'on clique sur le bouton commander
 
 
-    const body = makeRequestBody()
-    fetch("http://localhost:3000/api/products/order", {
-        method: "POST",
-        body: JSON.stringify(body),
-        headers: {
-            'Accept': 'application/json', 
-            "Content-Type": "application/json"
-        }
-    })
-    .then((res) => res.json())
-    .then((data) => {
-        const orderId = data.orderId  // pour envoyer les données vers la page de confirmation
-        window.location.href = "confirmation.html" + "?orderId=" + orderId // l'orderId sera directement collé a l'url de la page confirmation
-    })
-    .catch((err) => console.error(err)) // cette ligne permet d'afficher les erreurs si il y'en a
+ function submitForm(e){
+     e.preventDefault()  // pour pas que ça actualise a chaque submit-formulaire
+     if (cart.length === 0 ) {
+         alert ("Veuillez sélectionner un produit à commander")
+         return  // pour que la requete ne se fasse pas si pas de produits dans le panier
+     }
 
-  //  console.log(form.elements)  // pour recup tous les elements du formulaire
-}
 
-function testForm(){
-    const form = document.querySelector(".cart__order__form")
-    const inputs = form.querySelectorAll("input")   // pour verifier que tous les champs input soient remplis
-    inputs.forEach((input) => {
-        if (input.value === ""){      // si une valeur est nulle, une alerte sera envoyée
-            alert("Veuillez remplir tous les champs du formulaire")
-   return true  // le formulaire ne sera pas envoyé si un input est vide 
-        }
-       return false // le formulaire sera envoyé si tout est rempli
-    })
-}
+     testForm()
+     //testEmail()
 
-function testEmail(){
-    const email = document.querySelector("#email").value
-    const regex = /^[A-Za-z0-9+_.-]+@(.+)$/  // le format accepté pour un email
-    if (regex.test(email) === false) {
-        alert("Veuillez saisir un email valide") // le formulaire ne sera pas envoyé si le mail n'est pas d'un bon format
-        return true
+     //if (testForm()) return  // si le testForm est invalide (true) on ne pourra pas aller plus loin
+     //if (testEmail()) return  // si le testEmail est invalide (true) on ne pourra pas aller plus loin
+
+
+     const body = makeRequestBody()
+     fetch("http://localhost:3000/api/products/order", {
+         method: "POST",
+         body: JSON.stringify(body),
+         headers: {
+             'Accept': 'application/json', 
+             "Content-Type": "application/json"
+         }
+     })
+     .then((res) => res.json())
+     .then((data) => {
+         const orderId = data.orderId  // pour envoyer les données vers la page de confirmation
+         window.location.href = "confirmation.html" + "?orderId=" + orderId // l'orderId sera directement collé a l'url de la page confirmation
+     })
+     .catch((err) => console.error(err)) // cette ligne permet d'afficher les erreurs si il y'en a
+
+   //  console.log(form.elements)  // pour recup tous les elements du formulaire
+ }
+
+
+
+ function testForm(){
+     const form = document.querySelector(".cart__order__form")
+     const inputs = form.querySelectorAll("input")   // pour verifier que tous les champs input soient remplis
+     inputs.forEach((input) => {
+         if (input.value === ""){      // si une valeur est nulle, une alerte sera envoyée
+             alert("Veuillez remplir tous les champs du formulaire")
+    return true  // le formulaire ne sera pas envoyé si un input est vide 
+         }
+        return false // le formulaire sera envoyé si tout est rempli
+     })
+ }
+
+// function testEmail(){
+//     const email = document.querySelector("#email").value
+//     const regex = /^[A-Za-z0-9+_.-]+@(.+)$/  // le format accepté pour un email
+//     if (regex.test(email) === false) {
+//         alert("Veuillez saisir un email valide") // le formulaire ne sera pas envoyé si le mail n'est pas d'un bon format
+//         return true
               
-        }
-        return false // le formulaire sera envoyé si l'email est ok 
+//         }
+//         return false // le formulaire sera envoyé si l'email est ok 
+//     }
+
+
+ function makeRequestBody() {
+     const form = document.querySelector(".cart__order__form")
+     const firstName = form.elements.firstName.value
+     const lastName = form.elements.lastName.value
+     const address = form.elements.address.value
+     const city = form.elements.city.value
+     const email = form.elements.email.value
+
+
+     const body = { contact : {
+         firstName: firstName,
+         lastName : lastName,
+         address: address,
+         city : city,
+         email : email
+
+     },
+     products: getIdsFromLocalStorage()
+
+     }
+ return body
+ }
+
+
+ function getIdsFromLocalStorage () {
+     const numberOfProducts = localStorage.length
+     const ids = []
+     for (let i = 0; i < numberOfProducts; i++) {
+         const key = localStorage.key(i)
+         const id = key.split("-")[0]
+         ids.push(id)
+     }
+     return ids
+ }
+
+
+
+
+
+
+
+let valuePrenom, valueNom, valueMail, valueAdresse, valueVille;
+
+
+
+
+////////////   P R E N O M
+
+
+firstName.addEventListener("input", function (e) {
+    const errorPrenom = document.getElementById("firstNameErrorMsg")
+    valuePrenom
+    if(e.target.value.length == 0) {
+        console.log("rien") 
+        errorPrenom.innerHTML = ""
+        valuePrenom = null
+        console.log(valuePrenom)
+    }
+    if (e.target.value.match(/^[a-z A-Z]{1,50}$/)){
+        errorPrenom.innerHTML = ""
+        valuePrenom = e.target.value
+        console.log("success")
+        console.log(valuePrenom)
+    }
+
+     if (!e.target.value.match(/^[a-z A-Z]{1,50}$/)){
+         errorPrenom.innerHTML = "Votre prénom ne doit pas contenir de chiffres ou caractères spéciaux"
+         valuePrenom = null
+         console.log("fail")
+     }
+})
+
+
+////////////   N O M
+
+lastName.addEventListener("input", function (e) {
+    const errorNom = document.getElementById("lastNameErrorMsg")
+    
+    if(e.target.value.length == 0) {
+        console.log("rien") 
+        errorNom.innerHTML = ""
+        valueNom = null
+        console.log(valueNom)
+    }
+    if (e.target.value.match(/^[a-z A-Z]{1,50}$/)){
+        errorNom.innerHTML = ""
+        valueNom = e.target.value
+        console.log("success")
+        console.log(valueNom)
+    }
+
+     if (!e.target.value.match(/^[a-z A-Z]{1,50}$/)){
+        errorNom.innerHTML = "Votre nom ne doit pas contenir de chiffres ou caractères spéciaux"
+        valueNom = null
+         console.log("fail")
+     }
+})
+
+
+////////////   A D R E S S E 
+
+address.addEventListener("input", function (e) {
+    const errorAdresse = document.getElementById("addressErrorMsg")
+    
+    if(e.target.value.length == 0) {
+        console.log("rien") 
+        errorAdresse.innerHTML = ""
+        valueAdresse = null
+        console.log(valueAdresse)
+    }
+    if (e.target.value.match(/^[0-9]{1,4}[a-z A-Z]{1,50}$/)){
+        errorAdresse.innerHTML = ""
+        valueAdresse = e.target.value
+        console.log("success")
+        console.log(valueAdresse)
+    }
+
+     if (!e.target.value.match(/^[0-9]{1,4}[a-z A-Z]{1,50}$/)){
+        errorAdresse.innerHTML = "Votre adresse doit commencer par un chiffre et ne pas contenir de caractères spéciaux"
+        valueAdresse = null
+         console.log("fail")
+     }
+})
+
+
+
+////////////   V I L L E 
+
+
+city.addEventListener("input", function (e) {
+    const errorVille = document.getElementById("cityErrorMsg")
+    
+    if(e.target.value.length == 0) {
+        console.log("rien") 
+        errorVille.innerHTML = ""
+        valueVille = null
+        console.log(valueVille)
+    }
+    if (e.target.value.match(/^[a-z A-Z]{1,50}$/)){
+        errorVille.innerHTML = ""
+        valueVille = e.target.value
+        console.log("success")
+        console.log(valueVille)
+    }
+
+     if (!e.target.value.match(/^[a-z A-Z]{1,50}$/)){
+        errorVille.innerHTML = "Votre nom de ville ne doit pas contenir de chiffres ou caractères spéciaux"
+        valueVille = null
+         console.log("fail")
+     }
+})
+
+
+
+////////////   E M A I L 
+
+email.addEventListener("input", function (e) {
+    const errorMail = document.getElementById("emailErrorMsg")
+
+    if(e.target.value.length == 0) {
+        errorMail.innerHTML = ""
+        valueMail = null
+        console.log(valueMail)
+
+    } else if (e.target.value.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)) {
+        errorMail.innerHTML = ""
+        valueMail = e.target.value
+        console.log(valueMail)
+    }
+    if (!e.target.value.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) && !e.target.value.length == 0){
+        errorMail.innerHTML = "Email incorrect ex: canape@gmail.com"
+        valueMail = null
     }
 
 
-
- 
-
-
-
-function makeRequestBody() {
-    const form = document.querySelector(".cart__order__form")
-    const firstName = form.elements.firstName.value
-    const lastName = form.elements.lastName.value
-    const address = form.elements.address.value
-    const city = form.elements.city.value
-    const email = form.elements.email.value
-
-
-    const body = { contact : {
-        firstName: firstName,
-        lastName : lastName,
-        address: address,
-        city : city,
-        email : email
-
-    },
-    products: getIdsFromLocalStorage()
-
-    }
-return body
-}
-
-function getIdsFromLocalStorage () {
-    const numberOfProducts = localStorage.length
-    const ids = []
-    for (let i = 0; i < numberOfProducts; i++) {
-        const key = localStorage.key(i)
-        const id = key.split("-")[0]
-        ids.push(id)
-    }
-    return ids
-}
-
+})
