@@ -98,14 +98,15 @@ function saveOrder(color, quantity){
     }
 
 
-    localStorage.setItem(key, JSON.stringify(data),
-   alert ("Votre produit a bien été ajouté au panier")) }
+
+//     localStorage.setItem(key, JSON.stringify(data),
+//    alert ("Votre produit a bien été ajouté au panier")) }
 
 
    /////////////   S O L U T I O N    M E N T O R    V E R I F    P A N I E R 
 
 
- //   let productInLocalStorage = JSON.parse(localStorage.getItem("product"))
+    let productInLocalStorage = JSON.parse(localStorage.getItem("product"))
 
     //  if (productInLocalStorage){
     //      const findResult = productInLocalStorage.find(data)
@@ -125,15 +126,15 @@ function saveOrder(color, quantity){
     //          }
     //      }else{
 
-        //       productInLocalStorage = []
-        //        productInLocalStorage.push(data)
-        //        localStorage.setItem("product", JSON.stringify(productInLocalStorage))
-        //        console.log(productInLocalStorage)
-        //        alert ("Votre produit a bien été ajouté au panier")
+               productInLocalStorage = []
+                productInLocalStorage.push(data)
+                localStorage.setItem("product", JSON.stringify(productInLocalStorage))
+                console.log(productInLocalStorage)
+                alert ("Votre produit a bien été ajouté au panier")
 
         //    }
         
-    
+}  
     
 
 

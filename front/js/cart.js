@@ -2,29 +2,30 @@
 const cart = [] // pour avoir une liste totale du panier
 
 
-  recupItemsDuCache()
+  //recupItemsDuCache()
   cart.forEach((item) => displayItem(item))
+  console.log(cart)
 
   
 
-  function recupItemsDuCache(){
-      const numberOfItems = localStorage.length  // pour récupérer le nb d'object ajoutés au panier
-      for (let i = 0; i < numberOfItems; i++) {
-          const item = localStorage.getItem(localStorage.key(i)) || ""
-          const itemObject = JSON.parse(item) // ≠ stringyfy, permet de transformer une string en objet
-          cart.push(itemObject) // dès qu'on aura un objet il sera push dans la liste du panier 
-      }
-  }
+//   function recupItemsDuCache(){
+//       const numberOfItems = localStorage.length  // pour récupérer le nb d'object ajoutés au panier
+//       for (let i = 0; i < numberOfItems; i++) {
+ //          const item = localStorage.getItem(localStorage.key(i)) || ""
+//           const itemObject = JSON.parse(item) // ≠ stringyfy, permet de transformer une string en objet
+//           cart.push(itemObject) // dès qu'on aura un objet il sera push dans la liste du panier 
+//       }
+//   }
 
 /////////////   S O L U T I O N    M E N T O R 
 
 
-// let productInLocalStorage = JSON.parse(localStorage.getItem('product'))
 
-// fetch("http://localhost:3000/api/products")
-// .then((res) => res.json()) 
-// .then((data) => {
-//     if (productInLocalStorage){
+ fetch("http://localhost:3000/api/products")
+ .then((res) => res.json()) 
+ .then ((res) => recupData(res))
+ //.then((data) => {
+ //    if (productInLocalStorage){
 //         for (p of productInLocalStorage){
 //             const product = data.find(d=> d._id === p.idProduit)
 //             if (product) {
@@ -35,6 +36,29 @@ const cart = [] // pour avoir une liste totale du panier
 //     }
 //    
 // })
+
+function recupData () {
+    
+    const numberOfItems = localStorage.length
+    console.log(numberOfItems)
+    for (let i = 0; i < numberOfItems; i++) {
+        const item = localStorage.getItem(localStorage.key(i))
+        const itemObject = JSON.parse(item)
+        //let item = JSON.parse(localStorage.getItem('product'))
+        console.log(item)
+        cart.push(itemObject)
+        console.log(cart)
+
+    // if (item){
+    //              for (p of item){
+    //                  const product = data.find(d=> d._id === p.idProduit)
+    //                  if (product) {
+    //                      p.price = product.price
+    
+    displayItem(item)
+}}
+            
+
 
 function displayItem(item){
     const article = makeArticle(item)
