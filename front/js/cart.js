@@ -1,63 +1,261 @@
 
-const cart = [] // pour avoir une liste totale du panier
 
 
-  //recupItemsDuCache()
-  cart.forEach((item) => displayItem(item))
-  console.log(cart)
-
-  
-
-//   function recupItemsDuCache(){
-//       const numberOfItems = localStorage.length  // pour récupérer le nb d'object ajoutés au panier
-//       for (let i = 0; i < numberOfItems; i++) {
- //          const item = localStorage.getItem(localStorage.key(i)) || ""
-//           const itemObject = JSON.parse(item) // ≠ stringyfy, permet de transformer une string en objet
-//           cart.push(itemObject) // dès qu'on aura un objet il sera push dans la liste du panier 
-//       }
-//   }
-
-/////////////   S O L U T I O N    M E N T O R 
-
+let productInLocalStorage = JSON.parse(localStorage.getItem('product'));
+console.log(productInLocalStorage);
 
 
  fetch("http://localhost:3000/api/products")
  .then((res) => res.json()) 
- .then ((res) => recupData(res))
- //.then((data) => {
- //    if (productInLocalStorage){
-//         for (p of productInLocalStorage){
-//             const product = data.find(d=> d._id === p.idProduit)
-//             if (product) {
-//                 p.price = product.price
+ .then((data) => {
+     if (productInLocalStorage){
+         for (p of productInLocalStorage){
+             const product = data.find(d=> d._id === p.idProduit)
+             if (product) {
+                 p.price = product.price
 
-//             }
-//         }
-//     }
-//    
-// })
+             }
+         }
+     } 
+     getCart()
+     
+   
+ })
 
-function recupData () {
+ function getCart() {
+
+    // Si le panier est vide
+
+    if (!productInLocalStorage) {
+
+        const titleCart = document.querySelector("h1");
+        const sectionCart = document.querySelector(".cart");
+
+        titleCart.innerHTML = "Votre panier est vide !";
+        sectionCart.style.display = "none";
+
+        // Si le panier est remplie
+
+    } else {
+
+        productInLocalStorage.forEach((produit, i) => {
+
+            // Insertion de l'élément "article"
+
+            let productArticle = document.createElement("article");
+            document.querySelector("#cart__items").appendChild(productArticle);
+            productArticle.className = "cart__item";
+            productArticle.setAttribute('data-id', produit._id);
+
+ 
+            // Insertion de l'élément "div"
+
+            let productDivImg = document.createElement("div");
+            productArticle.appendChild(productDivImg);
+            productDivImg.className = "cart__item__img";
+
+ 
+            // Insertion de l'image
+
+            let productImg = document.createElement("img");
+            productDivImg.appendChild(productImg);
+            productImg.src = produit.imageUrl;
+            productImg.alt = produit.altTxt;
+
+            // Insertion de l'élément "div"            
+
+            let productItemContent = document.createElement("div");
+            productArticle.appendChild(productItemContent);
+            productItemContent.className = "cart__item__content";
+
+
+            // Insertion de l'élément "div"
+
+            let productItemContentDescription = document.createElement("div");
+            productItemContent.appendChild(productItemContentDescription);
+            productItemContentDescription.className = "cart__item__content__description";
+
+
+            // Insertion de l'élément "h2"
+
+            let productTitle = document.createElement("h2");
+            productItemContentDescription.appendChild(productTitle);
+            productTitle.innerHTML = produit.name;
+
+ 
+            // Insertion de la couleur
+
+            let productGreen = document.createElement("p");
+            productTitle.appendChild(productGreen);
+            productGreen.innerHTML = produit.color;
+
+
+            // Insertion de l'élément "p"
+
+            let productPrice = document.createElement("p");
+            productTitle.appendChild(productPrice);
+            productPrice.innerHTML = produit.price + " €";
+ 
+
+            // Insertion de l'élément "div"
+
+            let productItemSettings = document.createElement("div");
+            productArticle.appendChild(productItemSettings);
+            productItemSettings.className = "cart__item__content__settings";
+ 
+
+            // Insertion de l'élément "div"
+
+            let productItemSettingsQuantity = document.createElement("div");
+            productItemSettings.appendChild(productItemSettingsQuantity);
+            productItemSettingsQuantity.className = "cart__item__content__settings__quantity";
+
+
+            // Insertion de "Qté : "
+
+            let productQte = document.createElement("p");
+            productItemSettingsQuantity.appendChild(productQte);
+            productQte.innerHTML = "Qté : " ;
+ 
+
+            // Insertion de la quantité
+
+            let input = document.createElement("input");
+            productItemSettingsQuantity.appendChild(input);
+            input.className = "itemQuantity";
+            input.value = produit.quantity;
+            input.setAttribute("type", "number");
+            input.setAttribute("name", "itemQuantity-" + produit.idProduit);
+            input.setAttribute("min", "1");
+            input.setAttribute("max", "100");
+            input.addEventListener("change", () => updatePriceAndQuantity (produit.id, input.value, produit, produit.quantity))
+
+ 
+
+            // Insertion de l'élément "div"
+
+            let productItemContentSettingsDelete = document.createElement("div");
+            productArticle.appendChild(productItemContentSettingsDelete);
+            productItemContentSettingsDelete.className = "cart__item__content__settings__delete";
+ 
+
+            // Insertion de "p" supprimer
+
+            let productItemDelete = document.createElement("p");
+            productItemContentSettingsDelete.appendChild(productItemDelete);
+            productItemDelete.className = "deleteItem";
+            productItemDelete.innerHTML = "Supprimer";
+            productItemDelete.addEventListener("click", () => deleteItem (produit))
+
+
+
+
+        })
+
+
+        getTotals()
+
+
+
+    }}
+
+
+    function getTotals() {
+
+            // Calcul de la quantité total
+
+    let total = 0                    // on définit la valeur du total sans les produits
+    const totalQuantity = document.querySelector("#totalQuantity")
+    productInLocalStorage.forEach((produit) => {
+    const totalCalculQuantity = produit.quantity
+    total += totalCalculQuantity // += signifie "total = total + totalCalculQuantity"
+    })
+    totalQuantity.textContent = total
+
+         // calcul du prix total
+
+    const totalPrice = document.querySelector("#totalPrice")
+    productInLocalStorage.forEach((produit) => {
+    const totalCalculPrice = (produit.price -1) * produit.quantity
+    total += totalCalculPrice // += signifie "total = total + totalCalculPrice"
+    totalPrice.textContent = total
+    })
+
+    updatePriceAndQuantity()
+    deleteItem(produit)
+}
+
+
+    function saveNewDataToLocalStorage () {
+        productInLocalStorage.forEach((produit) => {
+    let saveNewData = JSON.stringify(produit) // stringify pour que le changement de quantité soit dans un format que le local storage comprend
+    localStorage.setItem("product", saveNewData)
+    console.log( saveNewData)
+        })
+    }
+
+    function updatePriceAndQuantity(id, newValue, produit) {  // cette fonction va être utilisée dès qu'il y aura un changement de quantité et prix dans le panier
+        let itemToUpdate = productInLocalStorage.find(produit => produit.id === id && produit.quantity === quantity)
+        //let quantity = productInLocalStorage.find(produit => produit.quantity === quantity)
+        //produit.quantity = itemToUpdate.quantity
+        itemToUpdate.quantity = Number(newValue)
+        console.log(newValue)
+         
+        saveNewDataToLocalStorage (produit)
+        getTotals()
+        //deleteItem(produit)
+        deleteDataFromLocalStorage(produit)
     
-    const numberOfItems = localStorage.length
-    console.log(numberOfItems)
-    for (let i = 0; i < numberOfItems; i++) {
-        const item = localStorage.getItem(localStorage.key(i))
-        const itemObject = JSON.parse(item)
-        //let item = JSON.parse(localStorage.getItem('product'))
-        console.log(item)
-        cart.push(itemObject)
-        console.log(cart)
+    }
 
-    // if (item){
-    //              for (p of item){
-    //                  const product = data.find(d=> d._id === p.idProduit)
-    //                  if (product) {
-    //                      p.price = product.price
+    function deleteItem(produit){
+        const itemToDelete = productInLocalStorage.findIndex(  // findIndex sert à trouver le produit dans la liste
+            (produit) => produit.id)  
+        productInLocalStorage.splice(itemToDelete, 1) // cart.splice pour supprimer une array, il démarrera à itemToDelete et il en supprimera 1
+console.log(productInLocalStorage)
+
+
+
+articleToDelete.remove()
+console.log(articleToDelete)
+
+
+        const key = `${produit.id}`
+        console.log(key)
+        localStorage.removeItem('product',key)
+        //localStorage.setItem('product', JSON.stringify(productInLocalStorage));
+
+        
+
+
+        getTotals()
+
+        //deleteDataFromLocalStorage (produit)
+        deleteArticleFromPage (produit)
     
-    displayItem(item)
-}}
-            
+    }
+
+
+function deleteDataFromLocalStorage (produit){
+
+    const key = `${produit.id}` // à rajouter dans les backticks pour avoir la couleur
+    console.log("item à supprimer", key)
+         localStorage.removeItem(key)
+}
+
+
+
+      function deleteArticleFromPage(produit) {
+         const articleToDelete = document.querySelector(  
+             `article[data-id="${produit.id}`  // pour selectionner l'id et la couleur de l'article qu'on veut supprimer
+         )
+         console.log(articleToDelete)
+         //articleToDelete.remove() 
+    
+     }
+
+
+
 
 
 function displayItem(item){
@@ -71,30 +269,6 @@ function displayItem(item){
     displayTotalQuantity()
     displayTotalPrice()
 }
-
-function displayTotalQuantity() {
-    let total = 0                    // on définit la valeur du total sans les produits
-    const totalQuantity = document.querySelector("#totalQuantity")
-    cart.forEach((item) => {
-        const totalCalculQuantity = item.quantity
-        total += totalCalculQuantity // += signifie "total = total + totalCalculQuantity"
-    })
-    totalQuantity.textContent = total
-}
-
-
-
-
-function displayTotalPrice(){
-    let total = 0                    // on définit la valeur du total sans les produits
-    const totalPrice = document.querySelector("#totalPrice")
-    cart.forEach((item) => {
-        const totalCalculPrice = item.price * item.quantity
-        total += totalCalculPrice // += signifie "total = total + totalCalculPrice"
-    })
-    totalPrice.textContent = total
-}
-
 
 
 function makeCartContent (item) {
@@ -139,31 +313,12 @@ function addQuantityToSettings(settings, item){
 
 }
 
-function updatePriceAndQuantity(id, newValue, item) {      // cette fonction va être utilisée dès qu'il y aura un changement de quantité et prix dans le panier
-    const itemToUpdate = cart.find(item => item.id === id)
-    itemToUpdate.quantity = Number(newValue)
-    displayTotalQuantity ()
-    displayTotalPrice ()
-    saveNewDataToLocalStorage (item)
-
-}
-
-function deleteDataFromLocalStorage (item) {
-    const key = `${item.id}` // à rajouter dans les backticks pour avoir la couleur
-    localStorage.removeItem(key)
-}
-
-function saveNewDataToLocalStorage (item) {
-    const dataToSave = JSON.stringify(item) // stringify pour que le changement de quantité soit dans un format que le local storage comprend
-    const key = `${item.id}-${item.color}`
-    localStorage.setItem(key, dataToSave) // pour que l'update soit fait dans le localStorage
-}
 
 
 function addDeleteToSettings (settings, item){
     const div = document.createElement("div")
     div.classList.add("cart__item__content__settings__delete")
-    div.addEventListener ("click", () => deleteItem(item))
+    //div.addEventListener ("click", () => deleteItem(item))
 
 
     const p = document.createElement("p")
@@ -174,70 +329,6 @@ function addDeleteToSettings (settings, item){
 
 }
 
-function deleteItem(item){
-    const itemToDelete = cart.findIndex(  // findIndex sert à trouver le produit dans la liste
-        (product) => product.id === item.id && product.color === item.color)  
-    cart.splice(itemToDelete, 1) // cart.splice pour supprimer une array, il démarrera à itemToDelete et il en supprimera 1
-    displayTotalQuantity () // pour que ça soit mis à jour dans le total
-    displayTotalPrice()
-    deleteDataFromLocalStorage (item)
-    deleteArticleFromPage (item)
-    console.log(cart)
-
-}
-
-function deleteArticleFromPage(item) {
-    const articleToDelete = document.querySelector(  
-        `article[data-id="${item.id}"][data-color="${item.color}"]`  // pour selectionner l'id et la couleur de l'article qu'on veut supprimer
-    )
-    articleToDelete.remove() 
-
-}
-
-
-function makeDescription(item){
-    const description = document.createElement("div")  // creation div cart__item__content__description
-    description.classList.add("cart__item__content__description")
-
-    const h2 = document.createElement("h2")
-    h2.textContent = item.name  
-    const p = document.createElement("p")
-    p.textContent = item.color
-    const p2 = document.createElement("p")
-    p2.textContent = item.price + " €" // pour rajouter le signe €
-
-    description.appendChild(h2)
-    description.appendChild(p)
-    description.appendChild(p2)
-    return description
-}
-
-function displayArticle(article){
-    document.querySelector ("#cart__items").appendChild(article)
-}
-
-function makeArticle(item){
-    const article = document.createElement("article")  // création de l'article
-    article.classList.add("cart__item") // création de la class
-    article.dataset.id = item.id  // dataset permets de rajouter des attributs à des éléments html // nb d'article crée correspond au nb de produits(id) différents
-    article.dataset.color = item.color
-    return article
-}
-
-
-function makeImageDiv(item){
-    const div = document.createElement("div")
-    div.classList.add("cart__item__img")
-
-    const image = document.createElement('img')
-    image.src = item.imageUrl
-    image.alt = item.altTxt 
-    div.appendChild(image)
-    return div
-
-
-
-}
 
 ////////////////////////////              F O R M U L A I R E 
 
@@ -485,3 +576,182 @@ email.addEventListener("input", function (e) {
 
 
 })
+
+
+
+
+
+
+
+// const cart = [] // pour avoir une liste totale du panier
+
+
+//   //recupItemsDuCache()
+//   cart.forEach((item) => displayItem(item))
+//   console.log(cart)
+
+  
+
+//   function recupItemsDuCache(){
+//       const numberOfItems = localStorage.length  // pour récupérer le nb d'object ajoutés au panier
+//       for (let i = 0; i < numberOfItems; i++) {
+ //          const item = localStorage.getItem(localStorage.key(i)) || ""
+//           const itemObject = JSON.parse(item) // ≠ stringyfy, permet de transformer une string en objet
+//           cart.push(itemObject) // dès qu'on aura un objet il sera push dans la liste du panier 
+//       }
+//   }
+
+
+
+
+
+
+            // Calcul de la quantité total
+
+    //         let total = 0                    // on définit la valeur du total sans les produits
+    //         const totalQuantity = document.querySelector("#totalQuantity")
+    //         productInLocalStorage.forEach((produit) => {
+    //         const totalCalculQuantity = produit.quantity
+    //         total += totalCalculQuantity // += signifie "total = total + totalCalculQuantity"
+    //      })
+    //      totalQuantity.textContent = total
+
+
+
+    //      // calcul du prix total
+
+    // const totalPrice = document.querySelector("#totalPrice")
+    // productInLocalStorage.forEach((produit) => {
+    //     const totalCalculPrice = produit.price * produit.quantity
+    //     total += totalCalculPrice // += signifie "total = total + totalCalculPrice"
+    // })
+    // totalPrice.textContent = total
+
+     
+
+    // Sauvegarder la nouvelle quantité dans le localstorage
+    
+
+    // function deleteDataFromLocalStorage (produit) {
+    //     const key = `${produit.id}` // à rajouter dans les backticks pour avoir la couleur
+    //     console.log("item à supprimer", key)
+    //     //localStorage.removeItem(key)
+
+    // }
+
+
+    
+
+    // function deleteArticleFromPage(produit) {
+    //     const articleToDelete = document.querySelector(  
+    //         `article[data-id="${produit.id}`  // pour selectionner l'id et la couleur de l'article qu'on veut supprimer
+    //     )
+    //     articleToDelete.remove() 
+    
+    // }
+
+
+// function displayTotalQuantity() {
+//     let total = 0                    // on définit la valeur du total sans les produits
+//     const totalQuantity = document.querySelector("#totalQuantity")
+//     data.forEach((productInLocalStorage) => {
+//         const totalCalculQuantity = produit.quantity
+//         total += totalCalculQuantity // += signifie "total = total + totalCalculQuantity"
+//     })
+//     totalQuantity.textContent = total
+// }
+
+
+
+// function displayTotalPrice(){
+//     let total = 0                    // on définit la valeur du total sans les produits
+//     const totalPrice = document.querySelector("#totalPrice")
+//     cart.forEach((item) => {
+//         const totalCalculPrice = item.price * item.quantity
+//         total += totalCalculPrice // += signifie "total = total + totalCalculPrice"
+//     })
+//     totalPrice.textContent = total
+// }
+
+
+
+// function updatePriceAndQuantity(id, newValue, produit) {      // cette fonction va être utilisée dès qu'il y aura un changement de quantité et prix dans le panier
+//     const itemToUpdate = data.find(produit => produit.id === id)
+//     itemToUpdate.quantity = Number(newValue)
+//     displayTotalQuantity ()
+//     displayTotalPrice ()
+//     //saveNewDataToLocalStorage (produit)
+
+// }
+
+
+
+// function saveNewDataToLocalStorage (produit) {
+//     const dataToSave = JSON.stringify(produit) // stringify pour que le changement de quantité soit dans un format que le local storage comprend
+//     const key = `${produit.id}`
+//     localStorage.setItem(key, dataToSave) // pour que l'update soit fait dans le localStorage
+// }
+
+
+// function deleteItem(item){
+//     const itemToDelete = cart.findIndex(  // findIndex sert à trouver le produit dans la liste
+//         (product) => product.id === item.id && product.color === item.color)  
+//     cart.splice(itemToDelete, 1) // cart.splice pour supprimer une array, il démarrera à itemToDelete et il en supprimera 1
+//     displayTotalQuantity () // pour que ça soit mis à jour dans le total
+//     displayTotalPrice()
+//     deleteDataFromLocalStorage (item)
+//     deleteArticleFromPage (item)
+//     console.log(cart)
+
+// }
+
+// function deleteArticleFromPage(item) {
+//     const articleToDelete = document.querySelector(  
+//         `article[data-id="${item.id}"][data-color="${item.color}"]`  // pour selectionner l'id et la couleur de l'article qu'on veut supprimer
+//     )
+//     articleToDelete.remove() 
+
+// }
+
+
+// function makeDescription(item){
+//     const description = document.createElement("div")  // creation div cart__item__content__description
+//     description.classList.add("cart__item__content__description")
+
+//     const h2 = document.createElement("h2")
+//     h2.textContent = item.name  
+//     const p = document.createElement("p")
+//     p.textContent = item.color
+//     const p2 = document.createElement("p")
+//     p2.textContent = item.price + " €" // pour rajouter le signe €
+
+//     description.appendChild(h2)
+//     description.appendChild(p)
+//     description.appendChild(p2)
+//     return description
+// }
+
+// function displayArticle(article){
+//     document.querySelector ("#cart__items").appendChild(article)
+// }
+
+// function makeArticle(item){
+//     const article = document.createElement("article")  // création de l'article
+//     article.classList.add("cart__item") // création de la class
+//     article.dataset.id = item.id  // dataset permets de rajouter des attributs à des éléments html // nb d'article crée correspond au nb de produits(id) différents
+//     article.dataset.color = item.color
+//     return article
+// }
+
+
+// function makeImageDiv(item){
+//     const div = document.createElement("div")
+//     div.classList.add("cart__item__img")
+
+//     const image = document.createElement('img')
+//     image.src = item.imageUrl
+//     image.alt = item.altTxt 
+//     div.appendChild(image)
+//     return div
+
+// }

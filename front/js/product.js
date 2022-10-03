@@ -106,25 +106,26 @@ function saveOrder(color, quantity){
    /////////////   S O L U T I O N    M E N T O R    V E R I F    P A N I E R 
 
 
-    let productInLocalStorage = JSON.parse(localStorage.getItem("product"))
+    // let productInLocalStorage = JSON.parse(localStorage.getItem("product"))
 
-    //  if (productInLocalStorage){
-    //      const findResult = productInLocalStorage.find(data)
+    //   if (productInLocalStorage){
+    //       const findResult = productInLocalStorage.find(data)
 
-    //          if(findResult) {
-    //              let newQuantity =
-    //              parseInt(data.quantity)+parseInt(findResult.quantity)
-    //              findResult.quantity = newQuantity
+    //           if(findResult) 
+    //           {
+    //               let newQuantity =
+    //               parseInt(data.quantity)+parseInt(findResult.quantity)
+    //               findResult.quantity = newQuantity
     //              localStorage.setItem("products", JSON.stringify(productInLocalStorage, data))
-    //              console.log(productInLocalStorage)
-    //              alert ("Votre produit a bien été ajouté au panier")
-    //          } else {
-    //              productInLocalStorage.push(data)
-    //              localStorage.setItem("products", JSON.stringify(productInLocalStorage, data))
-    //              console.log(productInLocalStorage)
-    //              alert ("Votre produit a bien été ajouté au panier")
-    //          }
-    //      }else{
+    //               console.log(productInLocalStorage)
+    //               alert ("Votre produit a bien été ajouté au panier")
+    //           } else {
+    //               productInLocalStorage.push(data)
+    //               localStorage.setItem("products", JSON.stringify(productInLocalStorage, data))
+    //               console.log(productInLocalStorage)
+    //               alert ("Votre produit a bien été ajouté au panier")
+    //           }
+    //       }else{
 
                productInLocalStorage = []
                 productInLocalStorage.push(data)
@@ -132,9 +133,9 @@ function saveOrder(color, quantity){
                 console.log(productInLocalStorage)
                 alert ("Votre produit a bien été ajouté au panier")
 
-        //    }
+            }
         
-}  
+// }  
     
 
 
