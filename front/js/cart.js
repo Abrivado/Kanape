@@ -195,17 +195,15 @@ console.log(productInLocalStorage);
     }
 
     function updatePriceAndQuantity(id, newValue, produit) {  // cette fonction va être utilisée dès qu'il y aura un changement de quantité et prix dans le panier
-        let itemToUpdate = productInLocalStorage.find(produit => produit.id === id && produit.quantity === quantity)
+        let itemToUpdate = productInLocalStorage.find(produit => produit.id === id)
         //let quantity = productInLocalStorage.find(produit => produit.quantity === quantity)
-        //produit.quantity = itemToUpdate.quantity
+        produit.quantity = itemToUpdate.quantity
         itemToUpdate.quantity = Number(newValue)
         console.log(newValue)
          
         saveNewDataToLocalStorage (produit)
         getTotals()
-        //deleteItem(produit)
-        deleteDataFromLocalStorage(produit)
-    
+        deleteItem(produit)    
     }
 
     function deleteItem(produit){
@@ -215,33 +213,22 @@ console.log(productInLocalStorage);
 console.log(productInLocalStorage)
 
 
-
-articleToDelete.remove()
-console.log(articleToDelete)
-
-
         const key = `${produit.id}`
         console.log(key)
-        localStorage.removeItem('product',key)
-        //localStorage.setItem('product', JSON.stringify(productInLocalStorage));
-
+        localStorage.removeItem('product',key)  // pour supprimer l'item du localstorage
+     
         
-
-
         getTotals()
 
-        //deleteDataFromLocalStorage (produit)
-        deleteArticleFromPage (produit)
+    //    deleteArticleFromPage (produit)
     
     }
 
+    // let productArticle = document.createElement("article");
+    // document.querySelector("#cart__items").appendChild(productArticle);
+    // productArticle.className = "cart__item";
+    // productArticle.setAttribute('data-id', produit._id);
 
-function deleteDataFromLocalStorage (produit){
-
-    const key = `${produit.id}` // à rajouter dans les backticks pour avoir la couleur
-    console.log("item à supprimer", key)
-         localStorage.removeItem(key)
-}
 
 
 
