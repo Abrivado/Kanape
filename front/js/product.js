@@ -36,6 +36,7 @@ function displayProduct(produit) {   // fonction pour afficher les infos d'un ka
   }
 
 
+
 //                           A J O U T  A U  P A N I E R 
 
 
@@ -77,6 +78,8 @@ productChoice.addEventListener("click", () => {  // on va écouter lorsqu'on cli
         alert("Votre produit a bien été ajouté au panier !")
         // on appelle la function addToCart qui permet d'ajouter un nouvel article au panier
         addToCart(produitClient);
+
+        window.location.href = "cart.html"
     }
 });
 
