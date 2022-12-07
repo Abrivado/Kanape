@@ -1,204 +1,113 @@
-const queryString = window.location.search  // // ces lignes permettent de récupérer l'id de chaque produit lorsqu'on clique sur un canapé
-const urlParams = new URLSearchParams (queryString) // recup les infos id de la barre d'adresse de la page d'accueil
+const urlParams = new URLSearchParams (window.location.search)
+// URLsearchParams créé un objet pour avoir accès au données récup par document.location.search
+// document.location.search permet de récupérer l'id dans l'url après le "?"
+
 const id = urlParams.get("id")
-//if (id != null) {
-//   let itemPrice = 0}     // création d'une variable 
-//    let imgUrl, altText, articleName
+// const "id" permet de récupérer la valeur de la clé "id"
 
 
-fetch(`http://localhost:3000/api/products/${id}`)  // rajout de `` (backticks) autour de l'adresse pour pouvoir y inclure ${id}
-.then((res) => res.json())                         // ces lignes vont servir à récupérer les infos de l'id
-.then((res) => handleData(res))
+fetch(`http://localhost:3000/api/products/${id}`)  // recup du produit grâce à l'id depuis l'API
+.then((res) => res.json())                         // pour transformer la réponse en json
+.then((res) => displayProduct(res))                    // appel de la fonction displayProduct pour afficher le produit
 
-function handleData(canape){   
-    const { altTxt, colors, description, imageUrl, name, price} = canape // pour intégrer les infos récupéré de l'id
-    itemPrice = price  // cela permet de récupérer le prix auprès de l'API pour ensuite le coller à la variable "let" en haut
-    imgUrl = imageUrl
-    articleName = name
-    altText = altTxt
-    makeImageDiv(imageUrl, altTxt)
-    makeTitle (name)
-    makePrice (price)
-    makeCartContent (description)
-    makeColors (colors)
-}
 
-function makeImageDiv (imageUrl, altTxt){  
-    const image = document.createElement("img") //pour créer <img> avec une source et un alt
-    image.src = imageUrl
-    image.alt = altTxt
-    const parent = document.querySelector(".item__img")
-    if (parent != null) parent.appendChild(image) // obligé d'appendChild car 2 constantes
-}
+function displayProduct(produit) {   // fonction pour afficher les infos d'un kanap selectionné
+    const image = document.querySelector(".item__img");
+    const title = document.querySelector("#title");
+    const price = document.querySelector("#price");     //  création des const correspondants aux "#id" de chaque élément
+    const description = document.querySelector("#description");
+    const colors = document.querySelector("#colors");
+  
+    let img = document.createElement("img");  // creation de <img>
+    img.src = produit.imageUrl;               
+    img.alt = "Photographie d'un canapé"      // creation de l'alt
+  
+    image.appendChild(img);   // pour que l'image soit dans la div "item__img"
+    title.textContent = produit.name;
+    price.textContent = produit.price;
+    description.textContent = produit.description;
+  
+    produit.colors.forEach((color) => {  // creation d'une boucle pour que ça s'applique a toutes les couleurs pour chaque produit
+      let option = document.createElement("option");  // creation de la div "option"
+      option.value = color;   // pour pouvoir relever la valeur de la couleur
+      option.textContent += color;  // pour que les couleurs apparaissent dans le menu défilant
+      colors.appendChild(option);  // pour que les couleurs soient dans la div "#colors"
+    });
+  }
 
-function makeTitle (name){
-    const h1 = document.querySelector("#title")
-    if (h1 != null) h1.textContent = name
-}
-
-function makePrice (price){
-    const span = document.querySelector("#price")
-    if (span != null) span.textContent = price
-}
-
-function makeCartContent (description){
-    const p = document.querySelector("#description")
-    if (p != null) p.textContent = description
-}
-
-function makeColors (colors){
-    const select = document.querySelector("#colors")
-    if (select != null) {
-        colors.forEach((color) => {
-            const option = document.createElement("option")  // création des <options> pour les couleurs
-            option.value = color  // ajout des valeurs couleurs dans les options
-            option.textContent = color // ajout du contenu texte des couleurs
-            select.appendChild(option) // ajout des couleurs au menu select
-        })
-    }
-
-}
 
 //                           A J O U T  A U  P A N I E R 
 
 
 
-const button = document.querySelector("#addToCart")
-button.addEventListener("click", handleClick)  // pour voir ce qui se passe quand l'utilisateur clic
- 
-
-function handleClick(){
-    const color = document.querySelector("#colors").value
-    const quantity = document.querySelector("#quantity").value // pour récup les données de la couleur et de la quantité
+let produitClient = {};  // cette variable vide correspond au produit avant qu'il soit choisi et qu'il ai sa couleur et sa quantité
+produitClient._id = id;  // pour mettre l'id du produit sélectionné
 
 
-
-    if (isOrderInvalid(color, quantity)) return  // pour empecher la redirection au panier si il manque les infos
-
-    saveOrder(color, quantity) 
-
-
-    window.location.href = "cart.html" // puis redirection vers panier
-
-}
+let colorChoice = document.querySelector("#colors"); // selectionner la div des couleurs 
+colorChoice.addEventListener("input", (ec) => {   // pour écouter le choix de la quantité
+    let colorProduct = ec.target.value;     //recup de la couleur (value) de la cible (target) dans (ec : event-couleur) #color
+    produitClient.color = colorProduct;     //ajout de la couleur dans objet produitClient
+});
 
 
-function saveOrder(color, quantity){
-    const key = `${id}-${color}` // cette constant key sert à rajouter la couleur à l'id pour pouvoir différencier un même produit de couleurs différentes
+// on applique le même principe que la couleur à la quantité
+let quantityChoice = document.querySelector('input[id="quantity"]');  // on précise [id="quantity"] car il y a plusieurs id dans l'input
+quantityChoice.addEventListener("input", (eq) => {
+    let quantityProduct = eq.target.value;
+    produitClient.quantity = quantityProduct;
+})
 
-    const data = {            // j'ai crée cet objet afin que toutes ces données soient récup dans le localStorage sur une seule ligne
-        id: `${id}-${color}`,
-        color: color,
-        quantity: Number(quantity),
-        price: itemPrice,
-        imageUrl : imgUrl,
-        name: articleName,
-        altTxt : altText,
-        
+
+let productChoice = document.querySelector("#addToCart");  // on selectionne #addToCart qui correspond au bouton ajout au panier
+productChoice.addEventListener("click", () => {  // on va écouter lorsqu'on clique sur ce bouton
+
+    if (
+        produitClient.quantity < 1 ||
+        produitClient.quantity > 100 ||
+        produitClient.quantity === undefined ||      // pour pouvoir etre ajouté au panier, le produit ne doit pas avoir une de ces conditions
+        produitClient.color === "" ||
+        produitClient.color === undefined
+    ) {
+        // si une condition est réalisé il recevra cette alerte 
+        alert("Veuillez renseigner une couleur et une quantité (min 1 / max 100).");
+
+    } else {
+        // sinon cela signifie que tout est ok, l'alerte suivante apparaitra
+        alert("Votre produit a bien été ajouté au panier !")
+        // on appelle la function addToCart qui permet d'ajouter un nouvel article au panier
+        addToCart(produitClient);
+    }
+});
+
+
+function addToCart(produitClient) {
+    let productInLocalStorage = localStorage.getItem("savedBasket");
+
+    if (!productInLocalStorage) {     // si pas de produit dans productInLocalStorage,
+        localStorage.setItem("savedBasket", JSON.stringify([])); // création d'un tableau savedBasket avec ses données en stringify
+        productInLocalStorage = localStorage.getItem("savedBasket");
     }
 
+    // constante pour mettre les données du cart en objet
+    const cartJSON = JSON.parse(productInLocalStorage);
 
+    // .find permet de vérifier si un article d'une meme couleur est déjà dans le local storage, si c'est le cas l'alert apparait et MaJ de la nouvelle quantité du produit 
+    if (cartJSON.find(i => produitClient._id === i._id && produitClient.color === i.color)) {
+        alert("Article déjà choisi, mise à jour de la quantité");
 
-//     localStorage.setItem(key, JSON.stringify(data),
-//    alert ("Votre produit a bien été ajouté au panier")) }
+        // findIndex permet de trouver a quelle place se trouve ce même produit dans le panier
+        const productIndex = cartJSON.findIndex(i => produitClient._id === i._id && produitClient.color === i.color)
+        console.log(productIndex)
 
+        // pour ajouter la quantité au produit en question et la sauvegarder dans le localStorage grâce à setItem
+        const addQuantity = parseInt(produitClient.quantity) + parseInt(cartJSON[productIndex].quantity);
+        cartJSON[productIndex].quantity = addQuantity
+        localStorage.setItem("savedBasket", JSON.stringify(cartJSON));
 
-   /////////////   S O L U T I O N    M E N T O R    V E R I F    P A N I E R 
-
-
-    // let productInLocalStorage = JSON.parse(localStorage.getItem("product"))
-
-    //   if (productInLocalStorage){
-    //       const findResult = productInLocalStorage.find(data)
-
-    //           if(findResult) 
-    //           {
-    //               let newQuantity =
-    //               parseInt(data.quantity)+parseInt(findResult.quantity)
-    //               findResult.quantity = newQuantity
-    //              localStorage.setItem("products", JSON.stringify(productInLocalStorage, data))
-    //               console.log(productInLocalStorage)
-    //               alert ("Votre produit a bien été ajouté au panier")
-    //           } else {
-    //               productInLocalStorage.push(data)
-    //               localStorage.setItem("products", JSON.stringify(productInLocalStorage, data))
-    //               console.log(productInLocalStorage)
-    //               alert ("Votre produit a bien été ajouté au panier")
-    //           }
-    //       }else{
-
-               productInLocalStorage = []
-                productInLocalStorage.push(data)
-                localStorage.setItem("product", JSON.stringify(productInLocalStorage))
-                console.log(productInLocalStorage)
-                alert ("Votre produit a bien été ajouté au panier")
-
-            }
-        
-// }  
-    
-
-
-/////////////   A U T R E      S O L U T I O N    T E S T E E
-
-
-
-    // let tabProduct = JSON.parse(localStorage.getItem("produit", key))
-    // if (tabProduct != null){
-    // for (i = 0; i < tabProduct.length; i++) {
-    //     console.log("test");
-
-
- //       if (
-  //          tabProduct[i]._id == key._id 
-  //      ) {
-   //       return (
-     //       tabProduct[i].quantite++,
-       //     console.log("quantite++"),
-         //   localStorage.setItem("produit", JSON.stringify(tabProduct)),
-           // (tabProduct = JSON.parse(localStorage.getItem("produit"))),
-           // (spanQuantite.textContent = addQuantity(tabProduct))
-         // );
-      //  }
-//       }
-
-//     }
-
- //}
-
-
-
-   
- //   const productInLocalStorage = tabProduct
- //       if (productInLocalStorage){
- //           let newQuantity =  localStorage.getItem("product", JSON.stringify(productInLocalStorage))
-  //          newQuantity.quantity = Number(productInLocalStorage)
-    //    }
-            
-    //}
-    
-    
-    // JSON ne peut pas stocker des objets, mais seulement des string. C'est pour ça qu'il faut les stringify pour qu'elles puissent être interprétées
-    // le locaStorage sert a enregistrer les données pour chaque utilisateur sur le site (tel des cookies)
-
-  //  if (productInLocalStorage){
-    //const findResult = productInLocalStorage.find(color, id)
-    //}
-
-
-
-function isOrderInvalid(color, quantity){
-    if (color == null || color === "" || quantity == null || quantity == "0" || quantity > 100 || quantity < 0) { // si color ou quantity = null et/ou 0, envoyer le message d'erreur
-        alert("Veuillez sélectionner une couleur et une quantité entre 1 et 100")
-        return true  // si "true" apparait c'est qu'une des conditions de "if" est validée et donc pas de redirection au panier 
+        // sinon on ajoute l'article sans message d'alert dans le panier du localStorage
+    } else {
+        const newProduct = [...cartJSON, produitClient];
+        localStorage.setItem("savedBasket", JSON.stringify(newProduct));
     }
-    
 }
-
-
-
-
-
-
-
-

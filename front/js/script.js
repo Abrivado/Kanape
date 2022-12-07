@@ -5,7 +5,7 @@ fetch('http://localhost:3000/api/products')  // fetch va permettre de récup les
 
 function addProducts(data) {
 
-    data.forEach((canape)  => {  // cette ligne permets de répéter toutes les infos chaque canard
+    data.forEach((canape)  => {  // cette ligne permets de répéter toutes les infos chaque canape
 
         
     const _id = canape._id    // ces lignes permettent de récup les données de fetch et des les envoyer vers chacunes des class
