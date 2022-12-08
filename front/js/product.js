@@ -26,6 +26,7 @@ function displayProduct(produit) {   // fonction pour afficher les infos d'un ka
     title.textContent = produit.name;
     price.textContent = produit.price;
     description.textContent = produit.description;
+
   
     produit.colors.forEach((color) => {  // creation d'une boucle pour que ça s'applique a toutes les couleurs pour chaque produit
       let option = document.createElement("option");  // creation de la div "option"
@@ -33,6 +34,9 @@ function displayProduct(produit) {   // fonction pour afficher les infos d'un ka
       option.textContent += color;  // pour que les couleurs apparaissent dans le menu défilant
       colors.appendChild(option);  // pour que les couleurs soient dans la div "#colors"
     });
+
+dataProd(produit)
+
   }
 
 
@@ -108,9 +112,21 @@ function addToCart(produitClient) {
         cartJSON[productIndex].quantity = addQuantity
         localStorage.setItem("savedBasket", JSON.stringify(cartJSON));
 
+
         // sinon on ajoute l'article sans message d'alert dans le panier du localStorage
     } else {
         const newProduct = [...cartJSON, produitClient];
         localStorage.setItem("savedBasket", JSON.stringify(newProduct));
     }
 }
+
+
+
+const dataProd  = {
+    name : produit.name,
+    price : produit.price,
+    img : produit.imageUrl,
+    description : produit.description
+}
+console.log(data)
+localStorage.setItem("savedBasket", JSON.stringify(data))
