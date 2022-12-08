@@ -8,7 +8,7 @@ const id = urlParams.get("id")
 
 fetch(`http://localhost:3000/api/products/${id}`)  // recup du produit grâce à l'id depuis l'API
 .then((res) => res.json())                         // pour transformer la réponse en json
-.then((res) => displayProduct(res))                    // appel de la fonction displayProduct pour afficher le produit
+.then((dataProduit) => displayProduct(dataProduit))                    // appel de la fonction displayProduct pour afficher le produit
 
 
 function displayProduct(produit) {   // fonction pour afficher les infos d'un kanap selectionné
