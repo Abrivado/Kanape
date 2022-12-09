@@ -122,11 +122,16 @@ function addToCart(produitClient) {
 
 
 
-const dataProd  = {
-    name : produit.name,
-    price : produit.price,
-    img : produit.imageUrl,
-    description : produit.description
-}
-console.log(data)
-localStorage.setItem("savedBasket", JSON.stringify(data))
+// const dataProd  = {
+//     name : produit.name,
+//     price : produit.price,
+//     img : produit.imageUrl,
+//     description : produit.description
+// }
+// console.log(data)
+// localStorage.setItem(id, JSON.stringify(data))
+
+
+// le pb c'est que pour que ça s'enregistre dans le localStorage il faut que je definisse le produit. 
+// mon produit est définit dans la fonction displayProduct l.14, c'est elle qui reçoit les données du fetch
+// mais si je setItem à cet endroit, l'enregistrement se fera dès que je clique sur le produit 
