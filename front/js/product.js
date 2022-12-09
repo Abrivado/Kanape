@@ -1,137 +1,146 @@
-const urlParams = new URLSearchParams (window.location.search)
+
 // URLsearchParams créé un objet pour avoir accès au données récup par document.location.search
 // document.location.search permet de récupérer l'id dans l'url après le "?"
 
-const id = urlParams.get("id")
+const urlParams = new URLSearchParams (window.location.search)
+
 // const "id" permet de récupérer la valeur de la clé "id"
 
-
-fetch(`http://localhost:3000/api/products/${id}`)  // recup du produit grâce à l'id depuis l'API
-.then((res) => res.json())                         // pour transformer la réponse en json
-.then((dataProduit) => displayProduct(dataProduit))                    // appel de la fonction displayProduct pour afficher le produit
+const id = urlParams.get("id")
 
 
-function displayProduct(produit) {   // fonction pour afficher les infos d'un kanap selectionné
-    const image = document.querySelector(".item__img");
-    const title = document.querySelector("#title");
-    const price = document.querySelector("#price");     //  création des const correspondants aux "#id" de chaque élément
-    const description = document.querySelector("#description");
-    const colors = document.querySelector("#colors");
-  
-    let img = document.createElement("img");  // creation de <img>
-    img.src = produit.imageUrl;               
-    img.alt = "Photographie d'un canapé"      // creation de l'alt
-  
-    image.appendChild(img);   // pour que l'image soit dans la div "item__img"
-    title.textContent = produit.name;
-    price.textContent = produit.price;
+// je vérifie si les params match un ID de l'api :
+
+if (urlParams.has('id')) {
+     fetch('http://localhost:3000/api/products/' + id)
+     .then(response => response.json())
+     .then(data => {
+        console.log(data);
+        // pour envoyer les datas vers la fonction displayProduct
+        displayProduct(data);
+     })
+} else {
+    console.error("Un id est obligatoire !");
+}
+
+// function pour afficher le produit
+
+function displayProduct(produit) {
+       
+    let itemImg = document.querySelector('.item__img');  // selectionner .item__img
+
+    let img = document.createElement('img'); // création de l'élément + indiquer la src et alt des data de l'api
+    img.src = produit.imageUrl;
+    img.alt = produit.altTxt;
+    itemImg.appendChild(img);  // pour que l'img soient dans la div ".item__img"
+
+    let name = document.getElementById('title');     // recup l'id title du html
+    name.textContent = produit.name;   // remplir avec le name du produit via les datas api
+
+    let price = document.getElementById('price'); // recup l'id price du html
+    price.textContent = produit.price; // remplir avec le prix du produit via les datas api
+
+    let description = document.getElementById('description');
     description.textContent = produit.description;
 
-  
-    produit.colors.forEach((color) => {  // creation d'une boucle pour que ça s'applique a toutes les couleurs pour chaque produit
-      let option = document.createElement("option");  // creation de la div "option"
-      option.value = color;   // pour pouvoir relever la valeur de la couleur
-      option.textContent += color;  // pour que les couleurs apparaissent dans le menu défilant
-      colors.appendChild(option);  // pour que les couleurs soient dans la div "#colors"
-    });
+    let select = document.getElementById('colors'); // recup l'id colors du html
+    // faire une boucle pour check les couleurs du produit pour remplir les options du <select>
+    for (let i = 0; i < produit.colors.length; i++) {
+        let color = produit.colors[i];
 
-dataProd(produit)
-
-  }
-
-
-
-//                           A J O U T  A U  P A N I E R 
-
-
-
-let produitClient = {};  // cette variable vide correspond au produit avant qu'il soit choisi et qu'il ai sa couleur et sa quantité
-produitClient._id = id;  // pour mettre l'id du produit sélectionné
-
-
-let colorChoice = document.querySelector("#colors"); // selectionner la div des couleurs 
-colorChoice.addEventListener("input", (ec) => {   // pour écouter le choix de la quantité
-    let colorProduct = ec.target.value;     //recup de la couleur (value) de la cible (target) dans (ec : event-couleur) #color
-    produitClient.color = colorProduct;     //ajout de la couleur dans objet produitClient
-});
-
-
-// on applique le même principe que la couleur à la quantité
-let quantityChoice = document.querySelector('input[id="quantity"]');  // on précise [id="quantity"] car il y a plusieurs id dans l'input
-quantityChoice.addEventListener("input", (eq) => {
-    let quantityProduct = eq.target.value;
-    produitClient.quantity = quantityProduct;
-})
-
-
-let productChoice = document.querySelector("#addToCart");  // on selectionne #addToCart qui correspond au bouton ajout au panier
-productChoice.addEventListener("click", () => {  // on va écouter lorsqu'on clique sur ce bouton
-
-    if (
-        produitClient.quantity < 1 ||
-        produitClient.quantity > 100 ||
-        produitClient.quantity === undefined ||      // pour pouvoir etre ajouté au panier, le produit ne doit pas avoir une de ces conditions
-        produitClient.color === "" ||
-        produitClient.color === undefined
-    ) {
-        // si une condition est réalisé il recevra cette alerte 
-        alert("Veuillez renseigner une couleur et une quantité (min 1 / max 100).");
-
-    } else {
-        // sinon cela signifie que tout est ok, l'alerte suivante apparaitra
-        alert("Votre produit a bien été ajouté au panier !")
-        // on appelle la function addToCart qui permet d'ajouter un nouvel article au panier
-        addToCart(produitClient);
-
-        window.location.href = "cart.html"
-    }
-});
-
-
-function addToCart(produitClient) {
-    let productInLocalStorage = localStorage.getItem("savedBasket");
-
-    if (!productInLocalStorage) {     // si pas de produit dans productInLocalStorage,
-        localStorage.setItem("savedBasket", JSON.stringify([])); // création d'un tableau savedBasket avec ses données en stringify
-        productInLocalStorage = localStorage.getItem("savedBasket");
-    }
-
-    // constante pour mettre les données du cart en objet
-    const cartJSON = JSON.parse(productInLocalStorage);
-
-    // .find permet de vérifier si un article d'une meme couleur est déjà dans le local storage, si c'est le cas l'alert apparait et MaJ de la nouvelle quantité du produit 
-    if (cartJSON.find(i => produitClient._id === i._id && produitClient.color === i.color)) {
-        alert("Article déjà choisi, mise à jour de la quantité");
-
-        // findIndex permet de trouver a quelle place se trouve ce même produit dans le panier
-        const productIndex = cartJSON.findIndex(i => produitClient._id === i._id && produitClient.color === i.color)
-        console.log(productIndex)
-
-        // pour ajouter la quantité au produit en question et la sauvegarder dans le localStorage grâce à setItem
-        const addQuantity = parseInt(produitClient.quantity) + parseInt(cartJSON[productIndex].quantity);
-        cartJSON[productIndex].quantity = addQuantity
-        localStorage.setItem("savedBasket", JSON.stringify(cartJSON));
-
-
-        // sinon on ajoute l'article sans message d'alert dans le panier du localStorage
-    } else {
-        const newProduct = [...cartJSON, produitClient];
-        localStorage.setItem("savedBasket", JSON.stringify(newProduct));
+        let option = document.createElement('option');     // création de l'élément <option>
+        option.value = color;        // remplir la valeur de l'option par la couleur.
+        option.textContent = color;
+        select.appendChild(option);      // pour que <option> soit dans <select>
     }
 }
 
 
-
-// const dataProd  = {
-//     name : produit.name,
-//     price : produit.price,
-//     img : produit.imageUrl,
-//     description : produit.description
-// }
-// console.log(data)
-// localStorage.setItem(id, JSON.stringify(data))
+                            ////////  CLICK ADD TO CART
 
 
-// le pb c'est que pour que ça s'enregistre dans le localStorage il faut que je definisse le produit. 
-// mon produit est définit dans la fonction displayProduct l.14, c'est elle qui reçoit les données du fetch
-// mais si je setItem à cet endroit, l'enregistrement se fera dès que je clique sur le produit 
+
+let button = document.getElementById('addToCart'); // selection du button
+button.addEventListener('click', function() {   // écouter l'évènement lors du clic sur le bouton ajout au panier
+    console.log('Click sur button');
+    let title = document.getElementById('title');
+    // Récupérer le nom du produit depuis le title.
+    let name = title.textContent;
+    console.log(name)
+
+    let elementQuantity = document.getElementById('quantity');
+    let quantity = Number(elementQuantity.value); // recup valeur quantité + etre sur que ça soit un nombre
+
+    let elementColors = document.getElementById('colors');
+    let color = elementColors.value;  // recup la couleur
+
+    if (!color) {       // si aucune couleur selectionnée => une alerte.
+        alert ('Veuillez choisir une couleur svp')
+        return; // return pour ne pas aller plus loin
+    }
+
+    if (quantity < 1 || quantity > 100) {  // si la quantité est inférieure à 1 ou supérieur à 100 => une alerte.
+        alert ('Veuillez choisir une quantité entre 1 et 100 svp')
+        return; // return pour ne pas aller plus loin
+    }
+
+    // création de l'objet produit contenant (id, name, color et quantity) => données qui seront sauvegardé dans le localStorage
+    let produit = { id: id, name: name, color: color, quantity: quantity };
+
+    addProduct(produit); // appel de la function addProduct qui aura pour bu d'ajouter une fonction dans le localStorage
+    // elle ne pourra être appelé si les conditions plus haut sont respectés
+});
+
+
+                            ////////  GESTION LOCALSTORAGE
+
+
+// fonction pour sauvegarder un produit
+
+function saveProduct(produits) {  
+    localStorage.setItem("produits", JSON.stringify(produits)); // setItem permet d'ajouter des produits dans le localStorage
+} // .stringify permet de convertir le tableau en chaîne de caractère (obligé pour localStorage)
+
+
+
+ // fonction pour recup les produits sauvegardés dans le localStorage.
+
+function getAllProduct() {
+    let produits = localStorage.getItem("produits");    // getItem sert à recup les produits du localStorage avec le clé "produits"
+    if (produits == null) { // si pas de produit on retourne un tableau vide.
+        return [];
+    } else { // sinon on a de produit on convertir la chaîne JSON en tableau de produit.
+        return JSON.parse(produits);
+    }
+}
+
+// fonction pour verifier si le produit existe dans le localStorage avant de l'ajouter
+
+function addProduct(produit) {
+
+    // recup les produits sauvegardés dans le localStorage grâce à notre fonction
+    let produits = getAllProduct();
+
+    // .find permet de rechercher un produit est deja dans le panier grâce à id et coulor.
+    // si le produit n'existe pas on retourne undefined
+    let rechercheProduit = produits.find(p => p.id == produit.id && p.color == produit.color);
+
+    if (rechercheProduit != undefined) { // Si le produit existe (pas undefined) on modifie sa quantité 
+
+        if(rechercheProduit.quantity + produit.quantity > 100) { 
+            alert('Veuillez choisir une quantité entre 1 et 100 svp')
+            return; // Si la somme de l'ancien quantité et la nouvelle quantité est supérieur à 100 on affiche une erreur.
+
+        } else { // si le total est valide, MaJ de la quantité du produit dans le panier.
+            rechercheProduit.quantity = rechercheProduit.quantity + produit.quantity;
+        }
+    } else { 
+        produits.push(produit); // si le produit n'est pas deja dans le panier on le push normalement
+    }
+
+    saveProduct(produits); // fonction pour sauvegarder un produit dans le localStorage, elle sera appelé uniquement si tout est ok
+    alert ('Votre produit a bien été ajouté au panier');
+    window.location.href = "cart.html" // produit bien ajouté => redirection page panier
+}
+
+
