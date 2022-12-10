@@ -20,7 +20,12 @@ function recupererProduit(produit) {
          totaleQuantity = totaleQuantity + produit.quantity
          idTotaleQuantity.textContent = totaleQuantity;
          idTotalePrice.textContent=totalePrice;         
-    });
+    })
+    .catch((err) => {  // pour afficher une erreur si pb
+        document
+          .querySelector("#cartAndFormContainer")
+          .innerHTML = "<h1> Cette page est en maintenance,</<br> nous nous excusons pour la gêne occasionnée.</h1>";
+      });
 }
 // cette boucle permets parcourir tous les produits de localStorage
 for (let i = 0; i < produits.length ; i++) {
@@ -234,7 +239,12 @@ function testFormulaire(event) {  // cette fonction sert à verifier puis envoye
             // redirigié vers la page confirmation avec le numero de commande en paramétre sur l'URL
             location.href = 'confirmation.html?orderId='+ data.orderId;
             console.log(data);
-       });
+       })
+       .catch((err) => {
+        document
+          .querySelector("#cartAndFormContainer")
+          .innerHTML = "<h1> Cette page est en maintenance,</<br> nous nous excusons pour la gêne occasionné.</h1>";
+      });
     }
 }
 
