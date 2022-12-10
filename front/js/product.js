@@ -98,7 +98,7 @@ button.addEventListener('click', function() {   // écouter l'évènement lors d
 // fonction pour sauvegarder un produit
 
 function saveProduct(produits) {  
-    localStorage.setItem("produits", JSON.stringify(produits)); // setItem permet d'ajouter des produits dans le localStorage
+    localStorage.setItem("savedBasket", JSON.stringify(produits)); // setItem permet d'ajouter des produits dans le localStorage
 } // .stringify permet de convertir le tableau en chaîne de caractère (obligé pour localStorage)
 
 
@@ -106,7 +106,7 @@ function saveProduct(produits) {
  // fonction pour recup les produits sauvegardés dans le localStorage.
 
 function getAllProduct() {
-    let produits = localStorage.getItem("produits");    // getItem sert à recup les produits du localStorage avec le clé "produits"
+    let produits = localStorage.getItem("savedBasket");    // getItem sert à recup les produits du localStorage avec le clé "savedBasket"
     if (produits == null) { // si pas de produit on retourne un tableau vide.
         return [];
     } else { // sinon on a de produit on convertir la chaîne JSON en tableau de produit.
